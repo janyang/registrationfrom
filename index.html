@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>朝陽青年 報名報到系統</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f7f4;--bg2:#ffffff;--bg3:#f1efe8;
+  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);
+  --text:#1a1a18;--text2:#5f5e5a;--text3:#9a9890;
+  --r:10px;--rl:14px;
+  --blue-bg:#e6f1fb;--blue-t:#0c447c;--blue-b:#185fa5;
+  --teal-bg:#e1f5ee;--teal-t:#085041;--teal-b:#0f6e56;
+  --amber-bg:#faeeda;--amber-t:#633806;--amber-b:#854f0b;
+  --red-bg:#fcebeb;--red-t:#791f1f;--red-b:#a32d2d;
+  --green-bg:#eaf3de;--green-t:#27500a;--green-b:#3b6d11;
+  --purple-bg:#eeedfe;--purple-t:#3c3489;--purple-b:#534ab7;
+  --pink-bg:#fbeaf0;--pink-t:#72243e;--pink-b:#993556;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;
+    --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.2);
+    --text:#e8e6de;--text2:#b4b2a9;--text3:#6e6c66;
+    --blue-bg:#0c2a45;--blue-t:#85b7eb;--blue-b:#378add;
+    --teal-bg:#042c1e;--teal-t:#5dcaa5;--teal-b:#1d9e75;
+    --amber-bg:#2e1f06;--amber-t:#fac775;--amber-b:#ba7517;
+    --red-bg:#2c0f0f;--red-t:#f09595;--red-b:#e24b4a;
+    --green-bg:#172108;--green-t:#97c459;--green-b:#639922;
+    --purple-bg:#1a1840;--purple-t:#afa9ec;--purple-b:#7f77dd;
+    --pink-bg:#2a0f1c;--pink-t:#ed93b1;--pink-b:#d4537e;
+  }
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;min-height:100vh}
+nav{background:var(--bg2);border-bottom:0.5px solid var(--border);display:flex;overflow-x:auto;padding:0 12px}
+nav button{background:none;border:none;border-bottom:2.5px solid transparent;padding:13px 14px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s}
+nav button.active{color:var(--text);border-bottom-color:var(--text)}
+nav button:hover:not(.active){color:var(--text)}
+.page{display:none;padding:20px 16px;max-width:800px;margin:0 auto}
+.page.active{display:block}
+h1{font-size:19px;font-weight:500;margin-bottom:4px}
+.subtitle{font-size:13px;color:var(--text2);margin-bottom:20px}
+.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rl);padding:18px;margin-bottom:14px}
+.card h2{font-size:14px;font-weight:500;margin-bottom:14px;color:var(--text)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:500}
+.field input,.field select,.field textarea{width:100%;padding:8px 10px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue-b);box-shadow:0 0 0 2px rgba(55,138,221,0.12)}
+.field textarea{resize:vertical;min-height:64px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.toggle-group{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}
+.toggle-group label{display:flex;align-items:center;gap:5px;padding:6px 12px;border:0.5px solid var(--border2);border-radius:var(--r);cursor:pointer;font-size:13px;transition:all .12s;user-select:none}
+.toggle-group label:has(input:checked){background:var(--blue-bg);border-color:var(--blue-b);color:var(--blue-t);font-weight:500}
+.toggle-group input[type=radio],.toggle-group input[type=checkbox]{display:none}
+.meal-group{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}
+.meal-group label{display:flex;align-items:center;gap:5px;padding:6px 13px;border:0.5px solid var(--border2);border-radius:var(--r);cursor:pointer;font-size:13px;transition:all .12s;user-select:none}
+.meal-group label.breakfast:has(input:checked){background:var(--amber-bg);border-color:var(--amber-b);color:var(--amber-t);font-weight:500}
+.meal-group label.lunch:has(input:checked){background:var(--teal-bg);border-color:var(--teal-b);color:var(--teal-t);font-weight:500}
+.meal-group label.dinner:has(input:checked){background:var(--purple-bg);border-color:var(--purple-b);color:var(--purple-t);font-weight:500}
+.meal-group input{display:none}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:0.5px solid var(--border2);border-radius:var(--r);background:none;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s;font-family:inherit}
+.btn:hover{background:var(--bg3)}
+.btn-primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn-primary:hover{opacity:.85;background:var(--text)}
+.btn-sm{padding:5px 11px;font-size:12px}
+.badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;display:inline-block}
+.badge.breakfast{background:var(--amber-bg);color:var(--amber-t);border:0.5px solid var(--amber-b)}
+.badge.lunch{background:var(--teal-bg);color:var(--teal-t);border:0.5px solid var(--teal-b)}
+.badge.dinner{background:var(--purple-bg);color:var(--purple-t);border:0.5px solid var(--purple-b)}
+.badge.qian{background:var(--blue-bg);color:var(--blue-t);border:0.5px solid var(--blue-b)}
+.badge.kun{background:var(--pink-bg);color:var(--pink-t);border:0.5px solid var(--pink-b)}
+.activity-banner{background:var(--blue-bg);border:0.5px solid var(--blue-b);border-radius:var(--rl);padding:13px 16px;margin-bottom:18px}
+.activity-banner h3{font-size:15px;font-weight:500;color:var(--blue-t)}
+.activity-banner .meta{font-size:12px;color:var(--blue-t);opacity:.75;margin-top:2px}
+.activity-banner .meals{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat-card{background:var(--bg3);border-radius:var(--r);padding:12px 14px}
+.stat-card .lbl{font-size:11px;color:var(--text2);margin-bottom:3px}
+.stat-card .val{font-size:26px;font-weight:500;line-height:1.2}
+.stat-card .sub{font-size:11px;color:var(--text3);margin-top:2px}
+.meal-row{display:grid;grid-template-columns:64px 1fr 1fr 1fr;gap:8px;align-items:center;margin-bottom:7px;font-size:13px}
+.meal-row .lbl{color:var(--text2);font-size:12px}
+.meal-num{text-align:center;font-weight:500;background:var(--bg3);border-radius:8px;padding:5px 0;font-size:14px}
+.section-lbl{font-size:12px;font-weight:500;color:var(--text3);margin:18px 0 8px;padding-bottom:5px;border-bottom:0.5px solid var(--border)}
+.zone-block{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rl);margin-bottom:10px;overflow:hidden}
+.zone-hd{padding:11px 15px;background:var(--bg3);display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.zone-hd h3{font-size:14px;font-weight:500}
+.zone-hd .cnt{font-size:12px;color:var(--text2)}
+.zone-bd{padding:0 13px 12px}
+.gender-block{margin-top:10px}
+.gender-lbl{font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:5px}
+.gender-lbl.q{background:var(--blue-bg);color:var(--blue-t)}
+.gender-lbl.k{background:var(--pink-bg);color:var(--pink-t)}
+.member-row{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.member-row:last-child{border-bottom:none}
+.member-row input[type=checkbox]{width:15px;height:15px;accent-color:var(--blue-b);cursor:pointer;flex-shrink:0}
+.member-name{flex:1;font-size:13px}
+.member-row.done .member-name{text-decoration:line-through;color:var(--text3)}
+.member-row.done{opacity:.6}
+.member-meta{font-size:11px;color:var(--text3)}
+.member-id{font-size:11px;background:var(--bg3);border-radius:4px;padding:1px 6px;color:var(--text2)}
+.dots{display:flex;gap:3px}
+.dot{width:7px;height:7px;border-radius:50%}
+.dot.breakfast{background:var(--amber-b)}
+.dot.lunch{background:var(--teal-b)}
+.dot.dinner{background:var(--purple-b)}
+.search-bar{width:100%;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;margin-bottom:12px}
+.search-bar:focus{border-color:var(--blue-b)}
+.zone-filter{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.zone-filter button{padding:4px 11px;border:0.5px solid var(--border2);border-radius:20px;background:none;color:var(--text2);font-size:12px;cursor:pointer;font-family:inherit;transition:all .12s}
+.zone-filter button.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+.msg{padding:9px 13px;border-radius:var(--r);font-size:13px;margin-bottom:12px}
+.msg.ok{background:var(--green-bg);color:var(--green-t);border:0.5px solid var(--green-b)}
+.msg.err{background:var(--red-bg);color:var(--red-t);border:0.5px solid var(--red-b)}
+.note-box{font-size:12px;background:var(--amber-bg);border:0.5px solid var(--amber-b);border-radius:var(--r);padding:9px 13px;margin-bottom:14px;color:var(--amber-t)}
+.empty{color:var(--text3);font-size:13px;padding:24px 0;text-align:center}
+.senior-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.senior-zone-card{background:var(--bg3);border-radius:var(--r);padding:12px}
+.senior-zone-card h4{font-size:13px;font-weight:500;margin-bottom:8px}
+.num-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px}
+.num-row label{color:var(--text2);font-size:12px;min-width:52px}
+.num-input{width:64px;padding:5px 8px;border:0.5px solid var(--border2);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none;text-align:center}
+.senior-meal-row{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.senior-meal-row label{display:flex;align-items:center;gap:4px;padding:4px 9px;border:0.5px solid var(--border2);border-radius:8px;cursor:pointer;font-size:12px;user-select:none}
+.senior-meal-row label.breakfast:has(input:checked){background:var(--amber-bg);border-color:var(--amber-b);color:var(--amber-t)}
+.senior-meal-row label.lunch:has(input:checked){background:var(--teal-bg);border-color:var(--teal-b);color:var(--teal-t)}
+.senior-meal-row label.dinner:has(input:checked){background:var(--purple-bg);border-color:var(--purple-b);color:var(--purple-t)}
+.senior-meal-row input{display:none}
+.member-list-search{position:relative;margin-bottom:8px}
+.member-list-search input{width:100%;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none}
+.member-list-search input:focus{border-color:var(--blue-b)}
+.member-dropdown{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);max-height:220px;overflow-y:auto;margin-top:4px}
+.member-option{padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:8px;transition:background .1s}
+.member-option:last-child{border-bottom:none}
+.member-option:hover{background:var(--bg3)}
+.member-option .mo-name{font-weight:500;flex:1}
+.member-option .mo-zone{font-size:11px;color:var(--text2)}
+.member-option .mo-gender{font-size:11px}
+.selected-member{background:var(--blue-bg);border:0.5px solid var(--blue-b);border-radius:var(--r);padding:10px 13px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.selected-member .sm-info{font-size:13px;color:var(--blue-t)}
+.selected-member .sm-clear{font-size:12px;color:var(--blue-t);cursor:pointer;opacity:.7;background:none;border:none;font-family:inherit}
+.mode-tabs{display:flex;gap:0;margin-bottom:14px;border:0.5px solid var(--border2);border-radius:var(--r);overflow:hidden}
+.mode-tab{flex:1;padding:8px;font-size:13px;font-weight:500;background:none;border:none;cursor:pointer;color:var(--text2);font-family:inherit;transition:background .12s,color .12s}
+.mode-tab.active{background:var(--text);color:var(--bg)}
+.import-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+.import-zone:hover{border-color:var(--blue-b);background:var(--blue-bg)}
+.import-zone p{font-size:13px;color:var(--text2);margin-top:6px}
+.roster-count{font-size:12px;color:var(--green-t);background:var(--green-bg);border:0.5px solid var(--green-b);border-radius:var(--r);padding:6px 12px;display:inline-block;margin-top:8px}
+.exp-table{width:100%;border-collapse:collapse;font-size:12px}
+.exp-table th{background:var(--bg3);padding:7px 9px;text-align:left;font-weight:500;border:0.5px solid var(--border);font-size:11px;color:var(--text2)}
+.exp-table td{padding:6px 9px;border:0.5px solid var(--border)}
+.exp-table tr:nth-child(even) td{background:var(--bg3)}
+@media(max-width:500px){
+  .row2,.row3,.stat-grid,.senior-grid{grid-template-columns:1fr}
+  .meal-row{grid-template-columns:52px 1fr 1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <button class="active" onclick="showPage('setup')">建立活動</button>
+  <button onclick="showPage('register')">報名</button>
+  <button onclick="showPage('checkin')">報到</button>
+  <button onclick="showPage('senior')">前輩設定</button>
+  <button onclick="showPage('stats')">便當統計</button>
+  <button onclick="showPage('export')">匯出</button>
+</nav>
+
+<!-- 建立活動 -->
+<div class="page active" id="page-setup">
+  <h1>建立活動</h1>
+  <p class="subtitle">管理員設定活動資訊，儲存後全站生效</p>
+  <div class="card">
+    <h2>活動資訊</h2>
+    <div class="field">
+      <label>活動名稱</label>
+      <input type="text" id="s-title" placeholder="例：朝陽青年 2026 讀書雙月（第一次）">
+    </div>
+    <div class="row2">
+      <div class="field"><label>活動日期</label><input type="date" id="s-date"></div>
+      <div class="field"><label>截止報名日期</label><input type="date" id="s-deadline"></div>
+    </div>
+    <div class="field">
+      <label>本次提供便當（可多選）</label>
+      <div class="meal-group">
+        <label class="breakfast"><input type="checkbox" id="m-breakfast"> 早餐</label>
+        <label class="lunch"><input type="checkbox" id="m-lunch"> 午餐</label>
+        <label class="dinner"><input type="checkbox" id="m-dinner"> 晚餐</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>Google 表單連結（選填，設定後報名資料自動送出）</label>
+      <input type="url" id="s-gform" placeholder="https://docs.google.com/forms/d/e/...">
+    </div>
+  </div>
+  <div class="card">
+    <h2>學員名單匯入</h2>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px">匯入後學員報名時可直接從名單中搜尋選取，支援 Excel (.xlsx) 與 CSV 格式</p>
+    <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-sm" onclick="downloadTemplate()">下載名單模板 (.csv)</button>
+      <span style="font-size:12px;color:var(--text3)">欄位：姓名、區別、性別、身份</span>
+    </div>
+    <div class="import-zone" onclick="document.getElementById('roster-file').click()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="margin:0 auto;display:block;opacity:.4"><path d="M12 4v12m0-12L8 8m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p>點擊選擇檔案，或拖曳至此</p>
+      <input type="file" id="roster-file" accept=".xlsx,.csv" style="display:none" onchange="importRoster(this)">
+    </div>
+    <div id="roster-status"></div>
+  </div>
+  <div class="card">
+    <h2>車次管理</h2>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px">各區司機名單已預設，可於此新增</p>
+    <div id="driver-summary"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center">
+      <select id="nd-zone" style="padding:7px 9px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none">
+        <option value="">區別</option>
+        <option value="1">一區</option><option value="2">二區</option><option value="3">三區</option>
+        <option value="4">四區</option><option value="5">五區</option><option value="6">六區</option>
+        <option value="7">七區</option><option value="8">八區</option>
+      </select>
+      <input type="text" id="nd-num" placeholder="車號" style="width:90px;padding:7px 9px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none">
+      <input type="text" id="nd-name" placeholder="司機姓名" style="width:120px;padding:7px 9px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none">
+      <button class="btn btn-sm" onclick="addDriver()">新增</button>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="saveActivity()">儲存活動設定</button>
+  <span id="setup-msg" style="margin-left:12px;font-size:13px;color:var(--green-t)"></span>
+</div>
+
+<!-- 報名 -->
+<div class="page" id="page-register">
+  <div id="reg-banner"></div>
+  <h1>活動報名</h1>
+  <p class="subtitle">填寫完整資料後送出</p>
+  <div id="reg-msg"></div>
+  <div class="card">
+    <div class="mode-tabs">
+      <button class="mode-tab active" onclick="switchMode('roster',this)">從名單選取</button>
+      <button class="mode-tab" onclick="switchMode('manual',this)">手動填寫</button>
+    </div>
+    <!-- 名單選取模式 -->
+    <div id="mode-roster">
+      <div id="selected-member-display"></div>
+      <div id="roster-search-wrap" class="member-list-search">
+        <input type="text" id="roster-search" placeholder="輸入姓名搜尋..." oninput="searchRoster(this.value)" autocomplete="off">
+        <div class="member-dropdown" id="roster-dropdown" style="display:none"></div>
+      </div>
+      <div id="roster-no-list" class="note-box" style="display:none">尚未匯入學員名單，請管理員至「建立活動」匯入，或切換到「手動填寫」。</div>
+    </div>
+    <!-- 手動填寫模式 -->
+    <div id="mode-manual" style="display:none">
+      <div class="row2">
+        <div class="field"><label>姓名 *</label><input type="text" id="r-name" placeholder="請輸入姓名"></div>
+        <div class="field">
+          <label>性別 *</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="r-gender" value="乾"> 乾道（男）</label>
+            <label><input type="radio" name="r-gender" value="坤"> 坤道（女）</label>
+          </div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>區別 *</label>
+          <select id="r-zone-m" onchange="updateCarsManual()">
+            <option value="">選擇區別</option>
+            <option value="1">一區</option><option value="2">二區</option><option value="3">三區</option>
+            <option value="4">四區</option><option value="5">五區</option><option value="6">六區</option>
+            <option value="7">七區</option><option value="8">八區</option>
+          </select>
+        </div>
+        <div class="field"><label>身份</label>
+          <select id="r-role-m">
+            <option value="班員">班員</option>
+            <option value="人才">人才</option>
+            <option value="小博士">小博士</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>車次</label>
+        <select id="r-car-m"><option value="">請先選擇區別</option></select>
+      </div>
+    </div>
+    <!-- 共用欄位（兩種模式都有） -->
+    <div id="shared-fields" style="display:none">
+      <div class="field" id="car-field-roster" style="display:none">
+        <label>車次</label>
+        <select id="r-car-r"><option value="">請選擇車次</option></select>
+      </div>
+      <div class="field" id="meal-field" style="display:none">
+        <label>便當需求（可多選）</label>
+        <div class="meal-group" id="r-meals"></div>
+      </div>
+      <div class="field"><label>備註</label><textarea id="r-note" placeholder="其他說明..."></textarea></div>
+      <button class="btn btn-primary" onclick="submitReg()" style="margin-top:4px">送出報名</button>
+    </div>
+    <!-- 手動模式送出 -->
+    <div id="manual-submit" style="display:none">
+      <div class="field" id="meal-field-m" style="display:none">
+        <label>便當需求（可多選）</label>
+        <div class="meal-group" id="r-meals-m"></div>
+      </div>
+      <div class="field"><label>備註</label><textarea id="r-note-m" placeholder="其他說明..."></textarea></div>
+      <button class="btn btn-primary" onclick="submitRegManual()" style="margin-top:4px">送出報名</button>
+    </div>
+  </div>
+  <div id="gform-note" class="note-box" style="display:none">Google 表單尚未設定，報名資料將暫存本機。請管理員至「建立活動」設定表單連結。</div>
+</div>
+
+<!-- 報到 -->
+<div class="page" id="page-checkin">
+  <div id="ci-banner"></div>
+  <h1>報到點名</h1>
+  <p class="subtitle">勾選即完成報到，即時更新便當統計</p>
+  <input class="search-bar" type="text" placeholder="搜尋姓名..." oninput="doSearch(this.value)">
+  <div class="zone-filter" id="zf">
+    <button class="active" onclick="filterZone(0,this)">全部</button>
+    <button onclick="filterZone(1,this)">一區</button><button onclick="filterZone(2,this)">二區</button>
+    <button onclick="filterZone(3,this)">三區</button><button onclick="filterZone(4,this)">四區</button>
+    <button onclick="filterZone(5,this)">五區</button><button onclick="filterZone(6,this)">六區</button>
+    <button onclick="filterZone(7,this)">七區</button><button onclick="filterZone(8,this)">八區</button>
+  </div>
+  <div id="checkin-area"><div class="empty">尚無報名資料</div></div>
+</div>
+
+<!-- 前輩設定 -->
+<div class="page" id="page-senior">
+  <h1>前輩設定</h1>
+  <p class="subtitle">各區管理員填寫前輩人數與便當需求，前輩算入便當統計但不列入出席人數</p>
+  <div id="senior-msg"></div>
+  <div class="senior-grid" id="senior-grid"></div>
+  <button class="btn btn-primary" style="margin-top:4px" onclick="saveSeniors()">儲存前輩設定</button>
+</div>
+
+<!-- 便當統計 -->
+<div class="page" id="page-stats">
+  <div id="st-banner"></div>
+  <h1>便當統計</h1>
+  <p class="subtitle">已報到學員 + 前輩，依餐型與性別統計</p>
+  <div class="stat-grid" id="total-stats"></div>
+  <div class="card">
+    <h2>各餐明細</h2>
+    <div style="display:grid;grid-template-columns:64px 1fr 1fr 1fr;gap:8px;margin-bottom:6px">
+      <div></div>
+      <div style="text-align:center;font-size:12px;color:var(--text2)">乾道</div>
+      <div style="text-align:center;font-size:12px;color:var(--text2)">坤道</div>
+      <div style="text-align:center;font-size:12px;color:var(--text2)">合計</div>
+    </div>
+    <div id="meal-detail"></div>
+  </div>
+  <div class="card">
+    <h2>各區統計</h2>
+    <div id="zone-stats"></div>
+  </div>
+</div>
+
+<!-- 匯出 -->
+<div class="page" id="page-export">
+  <h1>匯出報表</h1>
+  <p class="subtitle">下載或列印報名、報到資料</p>
+  <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+    <button class="btn" onclick="exportCSV()">下載 CSV</button>
+    <button class="btn" onclick="window.print()">列印</button>
+  </div>
+  <div class="card">
+    <h2>報名名單</h2>
+    <div id="exp-table" style="overflow-x:auto"></div>
+  </div>
+</div>
+
+<script>
+const ZONES=['一','二','三','四','五','六','七','八'];
+const MEAL_LABEL={breakfast:'早餐',lunch:'午餐',dinner:'晚餐'};
+const MEAL_KEYS=['breakfast','lunch','dinner'];
+
+const DEFAULT_DRIVERS={
+  1:[{num:'100',name:'小銀'},{num:'101',name:'鄭經理'},{num:'102',name:'天車'},{num:'103',name:''},{num:'104',name:'劉明村'},{num:'105',name:'劉念慈'},{num:'106',name:'高塗樹'},{num:'107',name:'徐誌鴻'},{num:'108',name:'陳佳佑'},{num:'109',name:'陳嫺吟'},{num:'110',name:''},{num:'111',name:'黃金洺'},{num:'112',name:'黃振雄'},{num:'113',name:'張翰文'},{num:'116',name:'洪秀慶'},{num:'118',name:'李麗紅'},{num:'119',name:'黃茂林'},{num:'120',name:'楊明欽'},{num:'121',name:'謝良英'},{num:'197',name:'機車'},{num:'198',name:'搭車'}],
+  2:[{num:'200',name:'鄭漢霖'},{num:'201',name:'邱萬全'},{num:'202',name:'蔡忠翰'},{num:'203',name:'黃新亭'},{num:'204',name:'黃宣邑'},{num:'297',name:'機車'},{num:'298',name:'搭車'}],
+  3:[{num:'300',name:'黃經理'},{num:'301',name:'黃顯仁'},{num:'304',name:'江福杉'},{num:'305',name:'謝靜潔'},{num:'306',name:'陳經理'},{num:'307',name:'謝靜如'},{num:'308',name:'張泰國'},{num:'309',name:'吳素珍'},{num:'310',name:'黃國湧'},{num:'311',name:'紀羽璘'},{num:'312',name:'紀經理'},{num:'313',name:'劉惠敏'},{num:'315',name:'黃昆明'},{num:'316',name:'陳仕濟'},{num:'317',name:'張萬華'},{num:'318',name:'邱顯芳'},{num:'322',name:'楊氏娥'},{num:'397',name:'機車'},{num:'398',name:'搭車'}],
+  4:[{num:'400',name:'呂欣潔'},{num:'401',name:'吳經理'},{num:'403',name:'吳永樹'},{num:'405',name:'游紫玲'},{num:'406',name:'武日宣'},{num:'407',name:'張仲偉'},{num:'409',name:'徐瑞玉'},{num:'497',name:'機車'},{num:'498',name:'搭車'}],
+  5:[{num:'500',name:'陳經理'},{num:'501',name:'張經理'},{num:'502',name:'江經理'},{num:'503',name:'羅登貴'},{num:'504',name:'吳正珍'},{num:'505',name:'吳傳國'},{num:'506',name:'盧冠明'},{num:'507',name:'彭沐源'},{num:'508',name:'彭俊偉'},{num:'509',name:'徐洪嬌'},{num:'510',name:'彭智萍'},{num:'511',name:'黃福全'},{num:'512',name:'吳明輝'},{num:'513',name:'吳玉如'},{num:'514',name:'林美娟'},{num:'515',name:'張永周'},{num:'516',name:'李名笙'},{num:'517',name:'姜志偉'},{num:'518',name:'鍾金陽'},{num:'519',name:'陳貞余'},{num:'521',name:'陳易聖'},{num:'522',name:'羅再昇'},{num:'597',name:'機車'},{num:'598',name:'搭車'}],
+  6:[{num:'600',name:'吳經理'},{num:'601',name:'冉經理'},{num:'602',name:'冉道揚'},{num:'603',name:'蔡易麃'},{num:'604',name:'李瑞才'},{num:'605',name:'簡銘福'},{num:'606',name:'徐愛枝'},{num:'607',name:'吳美瑩'},{num:'608',name:'趙心秋'},{num:'609',name:'錢方昱'},{num:'610',name:'劉凱彰'},{num:'611',name:'張金鋪'},{num:'697',name:'機車'},{num:'698',name:'搭車'}],
+  7:[{num:'700',name:'吳經理'},{num:'701',name:'吳東勇'},{num:'702',name:'郭先旺'},{num:'703',name:'江志龍'},{num:'705',name:'陳鴻銘'},{num:'706',name:'徐建銘'},{num:'707',name:'周世宜'},{num:'797',name:'機車'},{num:'798',name:'搭車'}],
+  8:[{num:'800',name:'蘇朝臣'},{num:'801',name:'吳冠佑'},{num:'802',name:'蘇翊綾'},{num:'803',name:'盧李枝'},{num:'804',name:'彭美麗'},{num:'805',name:'黃秋香'},{num:'897',name:'機車'},{num:'898',name:'搭車'}]
+};
+
+function ls(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}}
+function ss(k,v){localStorage.setItem(k,JSON.stringify(v))}
+
+let state={
+  activity: ls('cy_act'),
+  regs: ls('cy_regs')||[],
+  checkins: ls('cy_ci')||{},
+  drivers: ls('cy_dr')||JSON.parse(JSON.stringify(DEFAULT_DRIVERS)),
+  seniors: ls('cy_sr')||{},
+  roster: ls('cy_roster')||[]
+};
+
+function save(){
+  ss('cy_act',state.activity);
+  ss('cy_regs',state.regs);
+  ss('cy_ci',state.checkins);
+  ss('cy_dr',state.drivers);
+  ss('cy_sr',state.seniors);
+  ss('cy_roster',state.roster);
+}
+
+let zFilter=0,srchQ='';
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach((b,i)=>{
+    b.classList.toggle('active',['setup','register','checkin','senior','stats','export'][i]===id);
+  });
+  document.getElementById('page-'+id).classList.add('active');
+  if(id==='register')renderRegister();
+  if(id==='checkin')renderCheckin();
+  if(id==='senior')renderSenior();
+  if(id==='stats')renderStats();
+  if(id==='export')renderExport();
+  if(id==='setup')renderSetup();
+}
+
+function banner(a){
+  if(!a)return'';
+  const meals=(a.meals||[]).map(m=>`<span class="badge ${m}">${MEAL_LABEL[m]}</span>`).join('');
+  return`<div class="activity-banner"><h3>${a.title||'（未命名活動）'}</h3><p class="meta">${a.date||''}</p><div class="meals">${meals}</div></div>`;
+}
+
+function renderSetup(){
+  if(state.activity){
+    const a=state.activity;
+    document.getElementById('s-title').value=a.title||'';
+    document.getElementById('s-date').value=a.date||'';
+    document.getElementById('s-deadline').value=a.deadline||'';
+    document.getElementById('s-gform').value=a.gform||'';
+    MEAL_KEYS.forEach(m=>{const el=document.getElementById('m-'+m);if(el)el.checked=(a.meals||[]).includes(m);});
+  }
+  const el=document.getElementById('driver-summary');
+  let h='';
+  for(let z=1;z<=8;z++){
+    const named=(state.drivers[z]||[]).filter(d=>d.name&&d.name!=='機車'&&d.name!=='搭車');
+    h+=`<div style="margin-bottom:7px;font-size:13px"><span style="font-weight:500">${ZONES[z-1]}區：</span><span style="color:var(--text2)">${named.map(d=>d.num+' '+d.name).join('、')||'—'}</span></div>`;
+  }
+  el.innerHTML=h;
+  const st=document.getElementById('roster-status');
+  if(st&&state.roster&&state.roster.length){
+    st.innerHTML=`<div class="roster-count">目前已匯入 ${state.roster.length} 位學員</div>`;
+  }
+}
+
+function saveActivity(){
+  const title=document.getElementById('s-title').value.trim();
+  if(!title){alert('請填寫活動名稱');return;}
+  const meals=MEAL_KEYS.filter(m=>document.getElementById('m-'+m).checked);
+  state.activity={title,date:document.getElementById('s-date').value,deadline:document.getElementById('s-deadline').value,meals,gform:document.getElementById('s-gform').value.trim()};
+  save();
+  const el=document.getElementById('setup-msg');
+  el.textContent='已儲存！';
+  setTimeout(()=>el.textContent='',2000);
+}
+
+function addDriver(){
+  const z=parseInt(document.getElementById('nd-zone').value);
+  const num=document.getElementById('nd-num').value.trim();
+  const name=document.getElementById('nd-name').value.trim();
+  if(!z||!num||!name){alert('請填寫完整');return;}
+  if(!state.drivers[z])state.drivers[z]=[];
+  state.drivers[z].push({num,name});
+  save();
+  document.getElementById('nd-num').value='';
+  document.getElementById('nd-name').value='';
+  renderSetup();
+}
+
+let regMode='roster';
+let selectedMember=null;
+
+function switchMode(mode,btn){
+  regMode=mode;
+  document.querySelectorAll('.mode-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('mode-roster').style.display=mode==='roster'?'':'none';
+  document.getElementById('mode-manual').style.display=mode==='manual'?'':'none';
+  document.getElementById('shared-fields').style.display=(mode==='roster'&&selectedMember)?'':'none';
+  document.getElementById('manual-submit').style.display=mode==='manual'?'':'none';
+  if(mode==='manual')renderMealOptions('r-meals-m','meal-field-m');
+}
+
+function renderRegister(){
+  document.getElementById('reg-banner').innerHTML=banner(state.activity);
+  renderMealOptions('r-meals','meal-field');
+  renderMealOptions('r-meals-m','meal-field-m');
+  document.getElementById('gform-note').style.display=(state.activity&&state.activity.gform)?'none':'';
+  const hasRoster=state.roster&&state.roster.length>0;
+  const noList=document.getElementById('roster-no-list');
+  const srchWrap=document.getElementById('roster-search-wrap');
+  if(noList)noList.style.display=hasRoster?'none':'';
+  if(srchWrap)srchWrap.style.display=hasRoster?'':'none';
+  selectedMember=null;
+  renderSelectedMember();
+  document.getElementById('shared-fields').style.display='none';
+}
+
+function renderMealOptions(targetId,fieldId){
+  const a=state.activity;
+  const mf=document.getElementById(fieldId);
+  const el=document.getElementById(targetId);
+  if(!mf||!el)return;
+  if(a&&a.meals&&a.meals.length){
+    mf.style.display='';
+    el.innerHTML=a.meals.map(m=>`<label class="${m}"><input type="checkbox" name="${targetId}" value="${m}"> ${MEAL_LABEL[m]}</label>`).join('');
+  } else mf.style.display='none';
+}
+
+function searchRoster(q){
+  const dd=document.getElementById('roster-dropdown');
+  if(!q.trim()){dd.style.display='none';return;}
+  const results=state.roster.filter(p=>p.name&&p.name.includes(q)).slice(0,12);
+  if(!results.length){dd.innerHTML='<div class="member-option" style="color:var(--text3)">找不到符合的學員</div>';dd.style.display='';return;}
+  dd.innerHTML=results.map(p=>`<div class="member-option" onclick='selectMember(${JSON.stringify(p)})'>
+    <span class="mo-name">${p.name}</span>
+    <span class="mo-zone">${ZONES[(p.zone||1)-1]}區</span>
+    <span class="mo-gender badge ${p.gender==='乾'?'qian':'kun'}">${p.gender}</span>
+    <span class="mo-zone">${p.role||'班員'}</span>
+  </div>`).join('');
+  dd.style.display='';
+}
+
+function selectMember(p){
+  selectedMember=p;
+  document.getElementById('roster-search').value='';
+  document.getElementById('roster-dropdown').style.display='none';
+  renderSelectedMember();
+  updateCarsRoster();
+  document.getElementById('shared-fields').style.display='';
+}
+
+function renderSelectedMember(){
+  const el=document.getElementById('selected-member-display');
+  if(!el)return;
+  if(!selectedMember){el.innerHTML='';return;}
+  const p=selectedMember;
+  el.innerHTML=`<div class="selected-member">
+    <span class="sm-info">已選取：<strong>${p.name}</strong>　${ZONES[(p.zone||1)-1]}區　${p.gender==='乾'?'乾道':'坤道'}　${p.role||'班員'}</span>
+    <button class="sm-clear" onclick="clearMember()">重新選取</button>
+  </div>`;
+}
+
+function clearMember(){
+  selectedMember=null;
+  document.getElementById('shared-fields').style.display='none';
+  renderSelectedMember();
+  document.getElementById('roster-search').value='';
+}
+
+function updateCarsRoster(){
+  if(!selectedMember)return;
+  const z=selectedMember.zone||1;
+  const sel=document.getElementById('r-car-r');
+  const field=document.getElementById('car-field-roster');
+  const list=(state.drivers[z]||[]).filter(d=>d.name);
+  sel.innerHTML='<option value="">請選擇車次</option>'+list.map(d=>`<option value="${d.num}">${d.num} - ${d.name}</option>`).join('');
+  if(field)field.style.display='';
+}
+
+function updateCarsManual(){
+  const z=parseInt(document.getElementById('r-zone-m').value);
+  const sel=document.getElementById('r-car-m');
+  if(!z){sel.innerHTML='<option value="">請先選擇區別</option>';return;}
+  const list=(state.drivers[z]||[]).filter(d=>d.name);
+  sel.innerHTML='<option value="">請選擇車次</option>'+list.map(d=>`<option value="${d.num}">${d.num} - ${d.name}</option>`).join('');
+}
+
+function submitReg(){
+  if(!selectedMember){showMsg('reg-msg','請先從名單中選取學員','err');return;}
+  if(state.regs.find(r=>r.name===selectedMember.name&&r.zone===selectedMember.zone)){
+    showMsg('reg-msg',`${selectedMember.name} 已經報名過了！`,'err');return;
+  }
+  const meals=[...document.querySelectorAll('input[name="r-meals"]:checked')].map(e=>e.value);
+  const reg={id:Date.now(),name:selectedMember.name,gender:selectedMember.gender,zone:selectedMember.zone||1,role:selectedMember.role||'班員',car:document.getElementById('r-car-r').value,meals,note:document.getElementById('r-note').value.trim(),time:new Date().toISOString()};
+  state.regs.push(reg);
+  save();
+  if(state.activity&&state.activity.gform)sendGForm(reg);
+  showMsg('reg-msg',`${reg.name} 報名成功！`,'ok');
+  clearMember();
+  document.getElementById('r-note').value='';
+  document.querySelectorAll('input[name="r-meals"]').forEach(e=>e.checked=false);
+  document.getElementById('shared-fields').style.display='none';
+}
+
+function submitRegManual(){
+  const name=document.getElementById('r-name').value.trim();
+  const ge=document.querySelector('input[name="r-gender"]:checked');
+  const zone=document.getElementById('r-zone-m').value;
+  if(!name){showMsg('reg-msg','請填寫姓名','err');return;}
+  if(!ge){showMsg('reg-msg','請選擇性別','err');return;}
+  if(!zone){showMsg('reg-msg','請選擇區別','err');return;}
+  const meals=[...document.querySelectorAll('input[name="r-meals-m"]:checked')].map(e=>e.value);
+  const reg={id:Date.now(),name,gender:ge.value,zone:parseInt(zone),role:document.getElementById('r-role-m').value,car:document.getElementById('r-car-m').value,meals,note:document.getElementById('r-note-m').value.trim(),time:new Date().toISOString()};
+  state.regs.push(reg);
+  save();
+  if(state.activity&&state.activity.gform)sendGForm(reg);
+  showMsg('reg-msg',`${name} 報名成功！`,'ok');
+  document.getElementById('r-name').value='';
+  if(ge)ge.checked=false;
+  document.getElementById('r-zone-m').value='';
+  document.getElementById('r-car-m').innerHTML='<option value="">請先選擇區別</option>';
+  document.getElementById('r-note-m').value='';
+  document.querySelectorAll('input[name="r-meals-m"]').forEach(e=>e.checked=false);
+}
+
+function downloadTemplate(){
+  const csv='\uFEFF姓名,區別,性別,身份\n張小明,一區,乾,班員\n李小華,二區,坤,人才\n王小博,三區,乾,小博士\n';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='學員名單模板.csv';
+  a.click();
+}
+
+function importRoster(input){
+  const file=input.files[0];
+  if(!file)return;
+  const ext=file.name.split('.').pop().toLowerCase();
+  document.getElementById('roster-status').innerHTML='<div class="msg" style="background:var(--bg3);color:var(--text2)">讀取中...</div>';
+  if(ext==='csv'){
+    const reader=new FileReader();
+    reader.onload=e=>parseCSVRoster(e.target.result);
+    reader.readAsText(file,'UTF-8');
+  } else if(ext==='xlsx'){
+    if(typeof XLSX==='undefined'){
+      document.getElementById('roster-status').innerHTML='<div class="msg err">XLSX 需要網路，請使用 CSV 格式</div>';
+      return;
+    }
+    const reader=new FileReader();
+    reader.onload=e=>parseXLSXRoster(e.target.result);
+    reader.readAsArrayBuffer(file);
+  }
+  input.value='';
+}
+
+function parseCSVRoster(text){
+  const lines=text.replace(/\r/g,'').split('\n').filter(l=>l.trim());
+  const headers=lines[0].split(',').map(h=>h.trim().replace(/"/g,''));
+  const ni=headers.findIndex(h=>h.includes('姓名'));
+  const zi=headers.findIndex(h=>h.includes('區'));
+  const gi=headers.findIndex(h=>h.includes('性別'));
+  const ri=headers.findIndex(h=>h.includes('身份'));
+  const roster=[];
+  for(let i=1;i<lines.length;i++){
+    const cols=lines[i].split(',').map(c=>c.trim().replace(/"/g,''));
+    const name=ni>=0?cols[ni]:'';
+    if(!name)continue;
+    const zoneStr=zi>=0?cols[zi]:'';
+    const zone=ZONES.findIndex(z=>zoneStr.includes(z))+1||1;
+    const gender=gi>=0?cols[gi]:'乾';
+    const role=ri>=0?cols[ri]:'班員';
+    roster.push({name,zone,gender:gender.includes('坤')?'坤':'乾',role:role||'班員'});
+  }
+  finishImport(roster);
+}
+
+function parseXLSXRoster(buf){
+  const wb=XLSX.read(buf,{type:'array'});
+  const ws=wb.Sheets[wb.SheetNames[0]];
+  const data=XLSX.utils.sheet_to_json(ws,{header:1});
+  if(!data.length){finishImport([]);return;}
+  const headers=data[0].map(h=>String(h||'').trim());
+  const ni=headers.findIndex(h=>h.includes('姓名'));
+  const zi=headers.findIndex(h=>h.includes('區'));
+  const gi=headers.findIndex(h=>h.includes('性別'));
+  const ri=headers.findIndex(h=>h.includes('身份'));
+  const roster=[];
+  for(let i=1;i<data.length;i++){
+    const row=data[i];
+    const name=ni>=0?String(row[ni]||'').trim():'';
+    if(!name)continue;
+    const zoneStr=zi>=0?String(row[zi]||''):'';
+    const zone=ZONES.findIndex(z=>zoneStr.includes(z))+1||1;
+    const gender=gi>=0?String(row[gi]||''):'乾';
+    const role=ri>=0?String(row[ri]||''):'班員';
+    roster.push({name,zone,gender:gender.includes('坤')?'坤':'乾',role:role||'班員'});
+  }
+  finishImport(roster);
+}
+
+function finishImport(roster){
+  state.roster=roster;
+  save();
+  const st=document.getElementById('roster-status');
+  if(roster.length){
+    st.innerHTML=`<div class="roster-count">已匯入 ${roster.length} 位學員</div>`;
+  } else {
+    st.innerHTML='<div class="msg err">匯入失敗，請確認格式是否正確</div>';
+  }
+}
+
+function sendGForm(reg){
+  // 請將 entry.XXXXXXXX 替換為你的 Google 表單欄位 ID
+  // const base=state.activity.gform.replace('/viewform','/formResponse');
+  // const p=new URLSearchParams({'entry.XXXXXXXX':reg.name,'entry.XXXXXXXX':reg.gender,...});
+  // fetch(base+'?'+p,{method:'POST',mode:'no-cors'});
+  console.log('Google 表單待串接:',reg);
+}
+
+function showMsg(id,txt,type){
+  const el=document.getElementById(id);
+  el.innerHTML=`<div class="msg ${type}">${txt}</div>`;
+  setTimeout(()=>el.innerHTML='',3000);
+}
+
+function renderCheckin(){
+  document.getElementById('ci-banner').innerHTML=banner(state.activity);
+  const regs=getFiltered();
+  const area=document.getElementById('checkin-area');
+  if(!regs.length){area.innerHTML='<div class="empty">目前尚無報名資料</div>';return;}
+  const byZone={};
+  regs.forEach(r=>{
+    if(!byZone[r.zone])byZone[r.zone]={q:[],k:[]};
+    (r.gender==='乾'?byZone[r.zone].q:byZone[r.zone].k).push(r);
+  });
+  let h='';
+  Object.keys(byZone).sort((a,b)=>a-b).forEach(z=>{
+    const zn=parseInt(z);
+    const all=[...byZone[z].q,...byZone[z].k];
+    const done=all.filter(r=>state.checkins[r.id]).length;
+    h+=`<div class="zone-block"><div class="zone-hd"><h3>${ZONES[zn-1]}區</h3><span class="cnt">已到 ${done}/${all.length}</span></div><div class="zone-bd">`;
+    if(byZone[z].q.length){
+      h+=`<div class="gender-block"><span class="gender-lbl q">乾道</span>`;
+      byZone[z].q.forEach(r=>{h+=memberRow(r);});
+      h+=`</div>`;
+    }
+    if(byZone[z].k.length){
+      h+=`<div class="gender-block" style="margin-top:8px"><span class="gender-lbl k">坤道</span>`;
+      byZone[z].k.forEach(r=>{h+=memberRow(r);});
+      h+=`</div>`;
+    }
+    h+=`</div></div>`;
+  });
+  area.innerHTML=h;
+}
+
+function memberRow(r){
+  const done=state.checkins[r.id];
+  const dots=(r.meals||[]).map(m=>`<span class="dot ${m}" title="${MEAL_LABEL[m]}"></span>`).join('');
+  const carTxt=r.car?`車次 ${r.car}`:'';
+  return`<div class="member-row ${done?'done':''}" id="mrow-${r.id}">
+    <input type="checkbox" ${done?'checked':''} onchange="toggleCI(${r.id},this)">
+    <span class="member-name">${r.name}</span>
+    <span class="member-id">${r.role||'班員'}</span>
+    <span class="member-meta">${carTxt}</span>
+    <div class="dots">${dots}</div>
+  </div>`;
+}
+
+function toggleCI(id,el){
+  if(el.checked)state.checkins[id]=Date.now();
+  else delete state.checkins[id];
+  save();
+  const row=document.getElementById('mrow-'+id);
+  if(row)row.classList.toggle('done',el.checked);
+  updateZoneCnt();
+  if(document.getElementById('page-stats').classList.contains('active'))renderStats();
+}
+
+function updateZoneCnt(){
+  document.querySelectorAll('.zone-block').forEach(zb=>{
+    const total=zb.querySelectorAll('input[type=checkbox]').length;
+    const done=zb.querySelectorAll('input[type=checkbox]:checked').length;
+    const cnt=zb.querySelector('.cnt');
+    if(cnt)cnt.textContent=`已到 ${done}/${total}`;
+  });
+}
+
+function getFiltered(){
+  return state.regs.filter(r=>{
+    const zOk=zFilter===0||r.zone===zFilter;
+    const sOk=!srchQ||r.name.includes(srchQ);
+    return zOk&&sOk;
+  });
+}
+
+function filterZone(z,btn){
+  zFilter=z;
+  document.querySelectorAll('#zf button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCheckin();
+}
+
+function doSearch(q){srchQ=q;renderCheckin();}
+
+function renderSenior(){
+  const a=state.activity;
+  const meals=a?a.meals:[];
+  let h='';
+  for(let z=1;z<=8;z++){
+    const sr=state.seniors[z]||{qian:0,kun:0,meals:[]};
+    const mealOpts=meals.map(m=>`<label class="${m}"><input type="checkbox" id="sr-${z}-m-${m}" ${(sr.meals||[]).includes(m)?'checked':''}> ${MEAL_LABEL[m]}</label>`).join('');
+    h+=`<div class="senior-zone-card">
+      <h4>${ZONES[z-1]}區 前輩</h4>
+      <div class="num-row"><label>乾道人數</label><input class="num-input" type="number" min="0" id="sr-${z}-q" value="${sr.qian||0}"></div>
+      <div class="num-row"><label>坤道人數</label><input class="num-input" type="number" min="0" id="sr-${z}-k" value="${sr.kun||0}"></div>
+      ${meals.length?`<div style="font-size:11px;color:var(--text2);margin-top:6px;margin-bottom:3px">前輩需要的便當</div><div class="senior-meal-row">${mealOpts}</div>`:''}
+    </div>`;
+  }
+  document.getElementById('senior-grid').innerHTML=h;
+}
+
+function saveSeniors(){
+  const a=state.activity;
+  const meals=a?a.meals:[];
+  for(let z=1;z<=8;z++){
+    const qEl=document.getElementById(`sr-${z}-q`);
+    const kEl=document.getElementById(`sr-${z}-k`);
+    const selMeals=meals.filter(m=>{const el=document.getElementById(`sr-${z}-m-${m}`);return el&&el.checked;});
+    state.seniors[z]={qian:parseInt(qEl?qEl.value:0)||0,kun:parseInt(kEl?kEl.value:0)||0,meals:selMeals};
+  }
+  save();
+  showMsg('senior-msg','前輩設定已儲存！','ok');
+}
+
+function renderStats(){
+  document.getElementById('st-banner').innerHTML=banner(state.activity);
+  const a=state.activity;
+  const meals=a?a.meals:[];
+  const doneRegs=state.regs.filter(r=>state.checkins[r.id]);
+
+  let totalQ=0,totalK=0;
+  meals.forEach(m=>{
+    const rq=doneRegs.filter(r=>r.gender==='乾'&&(r.meals||[]).includes(m)).length;
+    const rk=doneRegs.filter(r=>r.gender==='坤'&&(r.meals||[]).includes(m)).length;
+    const sq=Object.values(state.seniors).reduce((s,sr)=>(sr.meals||[]).includes(m)?s+(sr.qian||0):s,0);
+    const sk=Object.values(state.seniors).reduce((s,sr)=>(sr.meals||[]).includes(m)?s+(sr.kun||0):s,0);
+    totalQ+=rq+sq; totalK+=rk+sk;
+  });
+
+  const attQ=doneRegs.filter(r=>r.gender==='乾').length;
+  const attK=doneRegs.filter(r=>r.gender==='坤').length;
+
+  document.getElementById('total-stats').innerHTML=`
+    <div class="stat-card"><div class="lbl">出席人數</div><div class="val">${attQ+attK}</div><div class="sub">乾 ${attQ} ／ 坤 ${attK}</div></div>
+    <div class="stat-card"><div class="lbl">乾道便當</div><div class="val">${totalQ}</div><div class="sub">含前輩</div></div>
+    <div class="stat-card"><div class="lbl">坤道便當</div><div class="val">${totalK}</div><div class="sub">含前輩</div></div>
+  `;
+
+  if(!meals.length){document.getElementById('meal-detail').innerHTML='<div class="empty" style="padding:12px 0">本活動未設定便當餐型</div>';} else {
+    let mh='';
+    meals.forEach(m=>{
+      const rq=doneRegs.filter(r=>r.gender==='乾'&&(r.meals||[]).includes(m)).length;
+      const rk=doneRegs.filter(r=>r.gender==='坤'&&(r.meals||[]).includes(m)).length;
+      const sq=Object.values(state.seniors).reduce((s,sr)=>(sr.meals||[]).includes(m)?s+(sr.qian||0):s,0);
+      const sk=Object.values(state.seniors).reduce((s,sr)=>(sr.meals||[]).includes(m)?s+(sr.kun||0):s,0);
+      mh+=`<div class="meal-row">
+        <div class="lbl"><span class="badge ${m}">${MEAL_LABEL[m]}</span></div>
+        <div class="meal-num">${rq+sq}<span style="font-size:10px;color:var(--text3);display:block">學員${rq}+前輩${sq}</span></div>
+        <div class="meal-num">${rk+sk}<span style="font-size:10px;color:var(--text3);display:block">學員${rk}+前輩${sk}</span></div>
+        <div class="meal-num" style="font-weight:500">${rq+sq+rk+sk}</div>
+      </div>`;
+    });
+    document.getElementById('meal-detail').innerHTML=mh;
+  }
+
+  let zh='';
+  for(let z=1;z<=8;z++){
+    const zRegs=doneRegs.filter(r=>r.zone===z);
+    const zQ=zRegs.filter(r=>r.gender==='乾').length;
+    const zK=zRegs.filter(r=>r.gender==='坤').length;
+    const sr=state.seniors[z]||{};
+    const srQ=sr.qian||0,srK=sr.kun||0;
+    let mealTxt='';
+    if(meals.length){
+      mealTxt=meals.map(m=>{
+        const mq=zRegs.filter(r=>r.gender==='乾'&&(r.meals||[]).includes(m)).length+((sr.meals||[]).includes(m)?srQ:0);
+        const mk=zRegs.filter(r=>r.gender==='坤'&&(r.meals||[]).includes(m)).length+((sr.meals||[]).includes(m)?srK:0);
+        return`<span class="badge ${m}" style="margin-right:4px">${MEAL_LABEL[m]} ${mq+mk}</span>`;
+      }).join('');
+    }
+    zh+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px;flex-wrap:wrap">
+      <span style="font-weight:500;min-width:32px">${ZONES[z-1]}區</span>
+      <span class="badge qian">乾 ${zQ}${srQ?'+前輩'+srQ:''}</span>
+      <span class="badge kun">坤 ${zK}${srK?'+前輩'+srK:''}</span>
+      ${mealTxt}
+    </div>`;
+  }
+  document.getElementById('zone-stats').innerHTML=zh||'<div class="empty">暫無資料</div>';
+}
+
+function renderExport(){
+  const cols=['姓名','性別','區別','身份','車次','便當','備註','報到','報名時間'];
+  const rows=state.regs.map(r=>[
+    r.name,r.gender,ZONES[r.zone-1]+'區',r.role||'班員',r.car||'—',
+    (r.meals||[]).map(m=>MEAL_LABEL[m]).join('、')||'—',
+    r.note||'—',state.checkins[r.id]?'已報到':'未報到',
+    r.time?new Date(r.time).toLocaleString('zh-TW'):''
+  ]);
+  let h=`<table class="exp-table"><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>`;
+  if(!rows.length)h+=`<tr><td colspan="${cols.length}" style="text-align:center;color:var(--text3);padding:16px">尚無資料</td></tr>`;
+  rows.forEach(r=>{h+=`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`;});
+  h+=`</tbody></table>`;
+  document.getElementById('exp-table').innerHTML=h;
+}
+
+function exportCSV(){
+  const cols=['姓名','性別','區別','身份','車次','便當','備註','報到','報名時間'];
+  const rows=state.regs.map(r=>[
+    r.name,r.gender,ZONES[r.zone-1]+'區',r.role||'班員',r.car||'',
+    (r.meals||[]).map(m=>MEAL_LABEL[m]).join('、'),r.note||'',
+    state.checkins[r.id]?'已報到':'未報到',
+    r.time?new Date(r.time).toLocaleString('zh-TW'):''
+  ]);
+  const csv='\uFEFF'+[cols,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`朝陽青年報名_${state.activity?state.activity.title:'export'}.csv`;
+  a.click();
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</body>
+</html>
